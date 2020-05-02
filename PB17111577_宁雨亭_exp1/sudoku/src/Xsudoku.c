@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include<time.h>
 
 int map[9][9];
 int assign[9][9]; // 1 - solved, 0 - unsolved
@@ -202,7 +203,7 @@ void BackTracking() {
 }
 
 int main() {
-     
+    int begin_time,end_time;
     // 读取输入
     char input_dir[30] = "../input/";
     char output_dir[30] = "../output/";
@@ -229,7 +230,15 @@ int main() {
     InitSudoku();
     step = 0;
     flag = 0;
+    begin_time = clock();
     BackTracking();
+    end_time = clock();
     if (flag) FPrintSudoku(fout);
+    if (CLOCKS_PER_SEC == 1000)
+        printf("time: %d ms\n", end_time - begin_time);
+    else {
+        printf("time: %d us\n", end_time - begin_time);
+    }
+
     return 0;
 }
