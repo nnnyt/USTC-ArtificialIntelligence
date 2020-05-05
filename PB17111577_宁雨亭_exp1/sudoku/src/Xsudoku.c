@@ -227,6 +227,8 @@ int main() {
     }
 
     GetInput(fin);
+    fclose(fin);
+    
     InitSudoku();
     step = 0;
     flag = 0;
@@ -239,6 +241,7 @@ int main() {
     else {
         printf("time: %d us\n", end_time - begin_time);
     }
+    fclose(fout);
 
     return 0;
 }
