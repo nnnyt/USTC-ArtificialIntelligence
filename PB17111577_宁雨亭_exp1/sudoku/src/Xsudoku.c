@@ -86,37 +86,37 @@ int IsConsistent(int row, int col, int value) {
     return 1;
 }
 
-int DegreeHeuristic(int row, int col) {
-    // 返回(row, col)元素的度（有多少约束）
-    int degree = 0;
-    for (int i = 0;i < 9;i++) {
-        // 行
-        if (i != col && assign[row][i] == 1) degree++;
-        // 列
-        if (i != row && assign[i][col] == 1) degree++;
-    }
-    // 小方块
-    int box_row = row / 3 * 3;
-    int box_col = col / 3 * 3;
-    for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 3; j++){
-            if(box_row + i != row && box_col + j != col)
-                if (assign[box_row + i][box_col + j] == 1)
-                    degree++;
-        }
-    }
-    if(row == col){
-        for (int i = 0; i < 9; i++){
-            if (i != row && assign[i][i] == 1) degree++;
-        }
-    }
-    if (row == 8-col) {
-        for (int i = 0; i < 9; i++){
-            if (i != row && assign[i][8-i] == 1) degree++;
-        }
-    }
-    return degree;
-}
+// int DegreeHeuristic(int row, int col) {
+//     // 返回(row, col)元素的度（有多少约束）
+//     int degree = 0;
+//     for (int i = 0;i < 9;i++) {
+//         // 行
+//         if (i != col && assign[row][i] == 1) degree++;
+//         // 列
+//         if (i != row && assign[i][col] == 1) degree++;
+//     }
+//     // 小方块
+//     int box_row = row / 3 * 3;
+//     int box_col = col / 3 * 3;
+//     for (int i = 0; i < 3; i++){
+//         for (int j = 0; j < 3; j++){
+//             if(box_row + i != row && box_col + j != col)
+//                 if (assign[box_row + i][box_col + j] == 1)
+//                     degree++;
+//         }
+//     }
+//     if(row == col){
+//         for (int i = 0; i < 9; i++){
+//             if (i != row && assign[i][i] == 1) degree++;
+//         }
+//     }
+//     if (row == 8-col) {
+//         for (int i = 0; i < 9; i++){
+//             if (i != row && assign[i][8-i] == 1) degree++;
+//         }
+//     }
+//     return degree;
+// }
 
 int MRVHeuristic(int row, int col) {
     // 返回(row, col)元素的可取值的个数
