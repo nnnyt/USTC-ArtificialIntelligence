@@ -1,13 +1,14 @@
 #include <cstdlib>
 #include <iostream>
 #include <cstring>
-#include <cassert>
-#include <cmath>
+// #include <cassert>
+// #include <cmath>
 #include <climits>
 #include <vector>
 #include <unordered_map>
 #include <queue>
 #include <stack>
+#include <ctime>
  
 using namespace std;
 
@@ -346,7 +347,24 @@ class Node {
             }
             else g = 0;
             h = getHeuristic();
+            // h = ManhattanHeuristic();
             f = g + h;
+        }
+
+        int ManhattanHeuristic() {
+            int h = 0;
+            for (int i = 0; i < 5; i++){
+                for (int j = 0; j < 5; j++){
+                    if (state[i][j] == 0) continue;
+                    else {
+                        int center_i, center_j;
+                        get_center(i, j, center_i, center_j);
+                        if (i == center_i && j == center_j)
+                            h += abs(i - goal_pos_i[state[i][j]]) + abs(j - goal_pos_j[state[i][j]]);
+                    }
+                }
+            }
+            return h;
         }
 
         int getHeuristic() {
@@ -422,6 +440,47 @@ Node *astar_search(int start[5][5]) {
     return node;
 }
 
+Node *idastar_search(int start[5][5]) {
+    int d_limit = 0;
+    Node *node;
+    Node *init_node = new Node(start, NULL);
+    step = 0;
+    d_limit = init_node->f;
+    while (true) {
+        int next_d_limit = INT_MAX;
+        visited_states.clear();
+        priority_queue<Node *, vector<Node *>, CompareNode > open;
+        open.push(init_node);
+        visited_states[*(init_node->state_str)] = init_node->f;
+        step ++;
+        cout << "d_limit: " << d_limit << endl;
+        while (!open.empty()) {
+            node = open.top();
+            open.pop();
+            if(node->f > d_limit) {
+                next_d_limit = next_d_limit > node->f ? node->f : next_d_limit;
+            }
+            else {
+                if (node->is_goal()){
+                    return node;
+                }
+                else if (visited_states[*(node->state_str)] == node->f){
+                    node->expand_node();
+                    for (int i = 0; i < node->children.size(); i++){
+                        open.push(node->children[i]);
+                        step ++;
+                    }
+                }
+            }
+            node ->free_state();
+        }
+        d_limit = next_d_limit;
+        // delete init_node;
+        // init_node = new Node(start, NULL);
+    }
+    return NULL;
+}
+
 void input_state(int start[5][5], FILE *fin){
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
@@ -462,6 +521,8 @@ Node *print_path(FILE *fout, Node *node){
 int main() {
     int start[5][5];
     int algorithm;
+    int begin_time, end_time;
+
     char input_dir[30] = "../input/";
     char output_dir[30] = "../output/";
     char filename[20];
@@ -486,10 +547,18 @@ int main() {
     }
     input_state(start, fin);
     Node *node;
+    begin_time = clock();
     if (algorithm == 0)
         node = astar_search(start);
+    else node = idastar_search(start);
+    end_time = clock();
     cout << "visited step: " << step << endl;
     cout << "move step: " << node->f << endl;
+    if (CLOCKS_PER_SEC == 1000)
+        printf("time: %d ms\n", end_time - begin_time);
+    else {
+        printf("time: %d us\n", end_time - begin_time);
+    }
     node = print_path(fout, node);
     delete node;
     fclose(fin);
