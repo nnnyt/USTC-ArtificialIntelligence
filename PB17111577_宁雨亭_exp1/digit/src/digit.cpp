@@ -475,8 +475,8 @@ Node *idastar_search(int start[5][5]) {
             node ->free_state();
         }
         d_limit = next_d_limit;
-        // delete init_node;
-        // init_node = new Node(start, NULL);
+        delete init_node;
+        init_node = new Node(start, NULL);
     }
     return NULL;
 }
