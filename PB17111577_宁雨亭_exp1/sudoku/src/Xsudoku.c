@@ -86,38 +86,6 @@ int IsConsistent(int row, int col, int value) {
     return 1;
 }
 
-// int DegreeHeuristic(int row, int col) {
-//     // 返回(row, col)元素的度（有多少约束）
-//     int degree = 0;
-//     for (int i = 0;i < 9;i++) {
-//         // 行
-//         if (i != col && assign[row][i] == 1) degree++;
-//         // 列
-//         if (i != row && assign[i][col] == 1) degree++;
-//     }
-//     // 小方块
-//     int box_row = row / 3 * 3;
-//     int box_col = col / 3 * 3;
-//     for (int i = 0; i < 3; i++){
-//         for (int j = 0; j < 3; j++){
-//             if(box_row + i != row && box_col + j != col)
-//                 if (assign[box_row + i][box_col + j] == 1)
-//                     degree++;
-//         }
-//     }
-//     if(row == col){
-//         for (int i = 0; i < 9; i++){
-//             if (i != row && assign[i][i] == 1) degree++;
-//         }
-//     }
-//     if (row == 8-col) {
-//         for (int i = 0; i < 9; i++){
-//             if (i != row && assign[i][8-i] == 1) degree++;
-//         }
-//     }
-//     return degree;
-// }
-
 int MRVHeuristic(int row, int col) {
     // 返回(row, col)元素的可取值的个数
     int mrv = 0;
@@ -132,19 +100,7 @@ int SelectUnassigned() {
     // 找到未解决的位置中度最大的一个，若返回-1则全部解决，-2则无解
     int row = 0;
     int col = 0;
-    // int degree = 0;
     int mrv = 10;
-    // for (int i = 0; i < 9; i++){
-    //     for (int j = 0; j < 9; j++){
-    //         if (assign[i][j] == 0) {
-    //             if (degree < DegreeHeuristic(i, j)) {
-    //                 row = i;
-    //                 col = j;
-    //                 degree = DegreeHeuristic(i, j);
-    //             }
-    //         }
-    //     }
-    // }
 
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
@@ -164,7 +120,6 @@ int SelectUnassigned() {
         }
     }
 
-    // if (degree) return row * 9 + col;
     // 如果mrv是10，表示没有未解决的元素，返回-1
     if (mrv != 10) return row * 9 + col;
     return -1;
