@@ -346,7 +346,8 @@ class Node {
                 g = parent->g + 1;
             }
             else g = 0;
-            h = getHeuristic();
+            // h = getHeuristic();
+            h = h3();
             // h = ManhattanHeuristic();
             f = g + h;
         }
@@ -400,6 +401,31 @@ class Node {
                 }
             }
             return h;
+        }
+
+        int h3(){
+            int h = 0;
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
+                    if(state[i][j] == 0) {
+                        continue;
+                    }
+                    else {
+                        int center_i, center_j;
+                        get_center(i, j, center_i, center_j);
+                        if (i == center_i && j == center_j){
+                            int dist = abs(i - goal_pos_i[state[i][j]]) + abs(j - goal_pos_j[state[i][j]]);
+                            if (state[i][j] == 7){
+                                h += 3 * dist;
+                            }
+                            else {
+                                h += dist;
+                            }
+                        }
+                    }
+                }
+            }
+            return 1.2 * h;
         }
 };
 
@@ -481,7 +507,7 @@ Node *idastar_search(int start[5][5]) {
     return NULL;
 }
 
-void input_state(int start[5][5], FILE *fin){
+void get_input(int start[5][5], FILE *fin){
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
             if(j == 4)
@@ -545,13 +571,16 @@ int main() {
         printf("Error: cannot open %s!\n", output_dir);
         return -1;
     }
-    input_state(start, fin);
+
+    get_input(start, fin);
     Node *node;
+
     begin_time = clock();
     if (algorithm == 0)
         node = astar_search(start);
     else node = idastar_search(start);
     end_time = clock();
+
     cout << "visited step: " << step << endl;
     cout << "move step: " << node->f << endl;
     if (CLOCKS_PER_SEC == 1000)
@@ -560,6 +589,7 @@ int main() {
         printf("time: %d us\n", end_time - begin_time);
     }
     node = print_path(fout, node);
+
     delete node;
     fclose(fin);
     fclose(fout);
