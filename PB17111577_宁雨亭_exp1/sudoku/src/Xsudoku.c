@@ -96,6 +96,38 @@ int MRVHeuristic(int row, int col) {
     return mrv;
 }
 
+int DegreeHeuristic(int row, int col) {
+    int degree = 0;
+    for (int i = 0; i < 9; i++) {
+        // 行
+        if (i!= col && assign[row][i] == 0) degree++;
+        // 列
+        if (i != row && assign[i][col] == 0) degree++;
+    }
+    //小方块
+    int box_row = row / 3 * 3;
+    int box_col = col / 3 * 3;
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            if(box_row + i != row && box_col + j != col)
+                if (assign[box_row + i][box_col + j] == 0)
+                    degree ++;
+        }
+    }
+    // X
+    if(row == col){
+        for (int i = 0; i < 9; i++){
+            if (i != row && assign[i][i] == 0) degree ++;
+        }
+    }
+    if (row == 8-col) {
+        for (int i = 0; i < 9; i++){
+            if (i != row && assign[i][8-i] == 0) degree ++;
+        }
+    }
+    return degree;     
+}
+
 int SelectUnassigned() {
     // 找到未解决的位置中度最大的一个，若返回-1则全部解决，-2则无解
     int row = 0;
@@ -110,6 +142,14 @@ int SelectUnassigned() {
                         row = i;
                         col = j;
                         mrv = MRVHeuristic(i, j);
+                    }
+                    else if (mrv == MRVHeuristic(i, j)){
+                        // mrv相同时选择度启发式更大的
+                        if (DegreeHeuristic(row, col) < DegreeHeuristic(i, j)) {
+                            row = i;
+                            col = j;
+                            mrv = MRVHeuristic(i, j);
+                        }
                     }
                 }
                 else {
