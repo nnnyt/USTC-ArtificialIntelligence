@@ -27,7 +27,7 @@ int goal_pos_i[22] = {4, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4
 int goal_pos_j[22] = {4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2};
 
 // 所有访问过的状态(open + close)
-unordered_map<string, int> visited_states;
+unordered_map<string, float> visited_states;
 enum direction {UP, LEFT, DOWN, RIGHT};
 
 class Node {
@@ -348,11 +348,11 @@ class Node {
             else g = 0;
             // h = getHeuristic();
             h = h3();
-            // h = ManhattanHeuristic();
+            // h = h1();
             f = g + h;
         }
 
-        int ManhattanHeuristic() {
+        int h1() {
             int h = 0;
             for (int i = 0; i < 5; i++){
                 for (int j = 0; j < 5; j++){
@@ -479,7 +479,7 @@ Node *idastar_search(int start[5][5]) {
         open.push(init_node);
         visited_states[*(init_node->state_str)] = init_node->f;
         step ++;
-        cout << "d_limit: " << d_limit << endl;
+        // cout << "d_limit: " << d_limit << endl;
         while (!open.empty()) {
             node = open.top();
             open.pop();
