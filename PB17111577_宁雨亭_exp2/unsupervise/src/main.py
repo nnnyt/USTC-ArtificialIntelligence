@@ -42,14 +42,29 @@ def evaluate(cluster, y):
     return r
 
 
+def visualize(pca_x, cluster):
+    from sklearn.manifold import TSNE
+    import pandas as pd
+    tsne = TSNE()
+    y = np.array(cluster).reshape(-1, 1)
+    x = pd.DataFrame(np.concatenate((pca_x, y), axis=-1))
+    a = tsne.fit_transform(x)
+    data = pd.DataFrame(a,index=x.index)
+    d1 = data[x[2]==0]
+    d2 = data[x[2]==1]
+    d3 = data[x[2]==2]
+    plt.plot(d1[0],d1[1],'r.',d2[0],d2[1],'go',d3[0],d3[1],'b*')
+    plt.show()
+
+
 if __name__ == '__main__': 
     dataset_dir = '../input/wine.data'
     x, y = load_data(dataset_dir)
-    model = PCA()
+    model = PCA(threshold=0.91)
     pca = model.fit(x)
     print('dim: ', pca.shape[1])
     kmodel = KMeans()
     cluster, s = kmodel.fit(pca)
     print('r: ', evaluate(cluster, y))
-    
+    visualize(pca, cluster)
 

@@ -21,9 +21,3 @@ class PCA:
         vec_m = eig_vec[val_index[:i]]
         vec_m = vec_m.T
         return np.dot(X, vec_m)
-
-
-
-
-
-        
