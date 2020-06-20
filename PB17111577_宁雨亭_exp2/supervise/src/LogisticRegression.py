@@ -14,7 +14,7 @@ class LogisticRegression:
         self.weight = np.ones((x_train.shape[1],1))
         x_train = np.mat(x_train)
         y_train = np.mat(y_train).T
-        for i in range(self.iter):
+        for _ in range(self.iter):
             h = self._sigmoid(x_train * self.weight)
             error = y_train - h
             self.weight += self.alpha * x_train.T * error
