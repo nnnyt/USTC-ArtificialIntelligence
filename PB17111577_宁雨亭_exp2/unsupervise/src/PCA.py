@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class PCA:
     
     def __init__(self, threshold=0.99):
@@ -8,7 +9,6 @@ class PCA:
     def fit(self, X):
         X_T = X.T
         mean_X = X_T - np.mean(X_T, axis=1, keepdims=True)
-        # X = X_T - mean_X
         cov_X = np.dot(mean_X, mean_X.T)
         eig_val, eig_vec = np.linalg.eig(cov_X)
         val_index = np.argsort(eig_val)[::-1]
