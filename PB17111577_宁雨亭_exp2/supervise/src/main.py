@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from LogisticRegression import LogisticRegression as LR
 from SVM import SVM
 
+
 MAT_DATASET = '../data/student/student-mat.csv'
 POR_DATASET = '../data/student/student-por.csv'
 
@@ -35,12 +36,14 @@ def load_data(filename=MAT_DATASET, algorithm='KNN', use_G = True):
     return x, labels
 
 
-def train_test_split(x, y, test_size=0.3, random_seed=212):
+def train_test_split(x, y, test_size=0.3):
     # shuffle
-    random.seed(random_seed)
-    random.shuffle(x)
-    random.seed(random_seed)
-    random.shuffle(y)
+    x = np.array(x)
+    y = np.array(y).reshape(-1, 1)
+    data = np.concatenate((x, y), axis=-1)
+    np.random.shuffle(data)
+    x = data[:, :-1]
+    y = data[:,-1]
 
     # split
     train_num = int(x.shape[0]*(1-test_size))
@@ -71,13 +74,12 @@ def evaluate(y_true, y_pred):
 
 if __name__ == '__main__':
     x, y = load_data(POR_DATASET, algorithm='SVM')
-    x_train, y_train, x_test, y_test = train_test_split(x, y, random_seed=200)
+    x_train, y_train, x_test, y_test = train_test_split(x, y)
     # model = KNN()
     # model = KNeighborsClassifier(n_neighbors=10)
     # model = LR()
-    model = SVM()
+    model = SVM(kernel='rbf')
     model.fit(x_train, y_train)
-    y_pred = model.predict(x_test)
+    y_pred = model.predict(x_test) 
+    # print(y_pred)
     print(evaluate(y_test, y_pred))
-
-

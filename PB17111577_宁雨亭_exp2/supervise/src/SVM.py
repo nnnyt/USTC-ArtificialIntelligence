@@ -3,7 +3,7 @@ import numpy as np
 
 class SVM:
 
-    def __init__(self, kernel='linear', C=1.0, epsilon=0.001, sigma=5.0):
+    def __init__(self, kernel='linear', C=100, epsilon=0.00001, sigma=5.0):
         self.C = C
         if kernel == 'linear':
             self.kernel = self._linear_kernel
@@ -39,9 +39,9 @@ class SVM:
     def _is_satisfy_KKT(self, i):
         yi = self.y_train[i]
         gxi = self._cal_g(i)
-        if (np.fabs(self.alpha[i]) < self.epsilon) and (yi * gxi >= 1):
+        if (np.fabs(self.alpha[i]) < self.epsilon) and (yi * gxi >= 1 - self.epsilon):
             return True
-        elif (np.fabs(self.alpha[i] - self.C) < self.epsilon) and (yi * gxi <= 1):
+        elif (np.fabs(self.alpha[i] - self.C) < self.epsilon) and (yi * gxi <= 1 + self.epsilon):
             return True
         elif (self.alpha[i] > -self.epsilon) and (self.alpha[i] < (self.C + self.epsilon)) \
                 and (np.fabs(yi * gxi - 1) < self.epsilon):
@@ -54,31 +54,42 @@ class SVM:
 
     def fit(self, x_train, y_train, max_iter=100):
         self.m, self.n = x_train.shape
-        self.alpha = np.zeros((self.m))
+        self.alpha = np.zeros(self.m)
         self.x_train = x_train
         self.y_train = y_train 
         self.k = np.zeros((self.m, self.m))
+
         for i in range(self.m):
             for j in range(i, self.n):
                 self.k[i, j] = self.k[j, i] = self.kernel(self.x_train[i], self.x_train[j]) 
+        self.E = []
+        for i in range(self.m):
+            self.E.append(-self.y_train[i])
 
         iteration = 0
-        changed = 1
-        while iteration<max_iter and changed > 0:
+        flag = 0
+        while flag == 0:
             iteration += 1
-            changed = 0
+            # print(iteration)
+            flag = 1
             for i in range(self.m):
                 # choose the first alpha
                 if self._is_satisfy_KKT(i) == False:
-                    E1 = self._cal_Ei(i)
-                    j = i
-                    while j == i:
-                        j = int(np.random.uniform(0, self.m))
-                    E2 = self._cal_Ei(j)
+                    E1 = self.E[i]
+                    maxdiff = -1
+                    for s in range(self.m):
+                        tempdiff = np.fabs(self.E[s] - E1)
+                        if tempdiff > maxdiff:
+                            maxdiff = tempdiff
+                            E2 = self.E[s]
+                            j = s
+                    if maxdiff == -1:
+                        continue
+
                     y1 = self.y_train[i]
                     y2 = self.y_train[j]
-                    alpha_old_1 = self.alpha[i].copy()
-                    alpha_old_2 = self.alpha[j].copy()
+                    alpha_old_1 = self.alpha[i]
+                    alpha_old_2 = self.alpha[j]
 
                     if y1 != y2:
                         L = max(0, alpha_old_2 - alpha_old_1)
@@ -88,6 +99,7 @@ class SVM:
                         H = min(self.C, alpha_old_2 + alpha_old_1)
                     if L == H:
                         continue
+                    
                     k11 = self.k[i, i]
                     k22 = self.k[j, j]
                     k21 = self.k[j, i]
@@ -113,23 +125,28 @@ class SVM:
                         b_new = b2_new
                     else:
                         b_new = (b1_new + b2_new) / 2
+
+                    if (np.fabs(alpha_new_2 - alpha_old_2) < self.epsilon ** 2) \
+                        and (np.fabs(alpha_new_1 - alpha_old_1) < self.epsilon ** 2):
+                        continue
+                    else:
+                        flag = 0
+                    
                     self.alpha[i] = alpha_new_1
                     self.alpha[j] = alpha_new_2
                     self.b = b_new
-                    if np.fabs(alpha_new_2 - alpha_old_2) >= 0.00001:
-                        changed += 1
+                    self.E[i] = self._cal_Ei(i)
+                    self.E[j] = self._cal_Ei(j)
 
     def predict(self, x_test):
-        y_test = [self._predict(x, k) for k, x in enumerate(x_test)]
-        return np.array(y_test)
+        y_test = [self._predict(x) for x in x_test]
+        return y_test
     
-    def _predict(self, x, k):
-        index = [i for i, alpha in enumerate(self.alpha) if alpha != 0]
+    def _predict(self, x):
+        index = [i for i, alpha in enumerate(self.alpha) if alpha > 0]
         r = 0
         for j in index:
-            r += self.alpha[j] * self.y_train[j] * self.kernel(x, self.x_train[k])
-            r += self.b
+            r += self.alpha[j] * self.y_train[j] * self.kernel(x, self.x_train[j])
+        r += self.b
         r = np.sign(r)
         return r
-            
-            
