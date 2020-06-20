@@ -1,9 +1,7 @@
 import numpy as np
 import csv
 from sklearn.preprocessing import LabelEncoder
-import random
 from KNN import KNN
-from sklearn.neighbors import KNeighborsClassifier
 from LogisticRegression import LogisticRegression as LR
 from SVM import SVM
 
@@ -76,7 +74,6 @@ if __name__ == '__main__':
     x, y = load_data(POR_DATASET, algorithm='SVM')
     x_train, y_train, x_test, y_test = train_test_split(x, y)
     # model = KNN()
-    # model = KNeighborsClassifier(n_neighbors=10)
     # model = LR()
     model = SVM(kernel='rbf')
     model.fit(x_train, y_train)
