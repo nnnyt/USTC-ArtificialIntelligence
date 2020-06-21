@@ -15,6 +15,10 @@ def load_data(filename):
     data  = np.array(data).T
     labels = data[:,0]
     x = data[:, 1:]
+    # min-max标准化
+    min_x = np.min(x, axis=0)
+    max_x = np.max(x, axis=0)
+    x = (x - min_x) / (max_x - min_x)
     # print(labels.shape)
     # print(x.shape)
     return x, labels
@@ -59,7 +63,7 @@ def visualize(pca_x, cluster):
 if __name__ == '__main__': 
     dataset_dir = '../input/wine.data'
     x, y = load_data(dataset_dir)
-    model = PCA(threshold=0.91)
+    model = PCA(threshold=0.5)
     pca = model.fit(x)
     print('dim: ', pca.shape[1])
     kmodel = KMeans()
