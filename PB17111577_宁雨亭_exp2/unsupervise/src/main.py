@@ -13,7 +13,6 @@ def load_data(filename):
             for i in range(13):
                 data[i].append(float(line[i]))
     data  = np.array(data).T
-    np.random.shuffle(data)
     labels = data[:,0]
     x = data[:, 1:]
     # print(labels.shape)
@@ -67,4 +66,4 @@ if __name__ == '__main__':
     cluster, s = kmodel.fit(pca)
     print('r: ', evaluate(cluster, y))
     visualize(pca, cluster)
-
+    np.savetxt('../output/output.csv', cluster, delimiter=',', fmt='%d')

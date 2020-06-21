@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class KMeans():
 
     def __init__(self, k=3):
@@ -45,7 +46,7 @@ class KMeans():
             index = np.random.randint(X.shape[0])
             center[i] = X[index]
         clusterChanged = True
-        cluster = np.zeros((X.shape[0]))
+        cluster = np.zeros((X.shape[0]), dtype='int32')
         while clusterChanged:
             clusterChanged = False
             # 聚类
