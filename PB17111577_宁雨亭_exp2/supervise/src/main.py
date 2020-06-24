@@ -20,10 +20,12 @@ def load_data(filename=MAT_DATASET, algorithm='KNN', use_G = True):
             labels.append(line[-1])
             for i in range(32):
                 attributes[i].append(line[i])
+    # label转换
     if algorithm == 'SVM':
         labels = list(map(lambda x: 1 if int(x) >= 10 else -1, labels))
     else:
         labels = list(map(lambda x: 1 if int(x) >= 10 else 0, labels))
+    # 类别属性转换
     for i in [0, 1, 3, 4, 5, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22]:
         attributes[i] = LabelEncoder().fit_transform(attributes[i])
     for i in range(len(attributes)):
@@ -71,11 +73,11 @@ def evaluate(y_true, y_pred):
 
 
 if __name__ == '__main__':
-    x, y = load_data(POR_DATASET, algorithm='SVM')
+    x, y = load_data(POR_DATASET, algorithm='KNN', use_G=False)
     x_train, y_train, x_test, y_test = train_test_split(x, y)
-    # model = KNN()
-    # model = LR()
-    model = SVM(kernel='rbf')
+    # model = KNN(k=10)
+    model = LR()
+    # model = SVM(kernel='linear')
     model.fit(x_train, y_train)
     y_pred = model.predict(x_test) 
     # print(y_pred)

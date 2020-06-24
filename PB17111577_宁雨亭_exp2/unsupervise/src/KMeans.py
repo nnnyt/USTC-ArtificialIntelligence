@@ -47,6 +47,7 @@ class KMeans():
             center[i] = X[index]
         clusterChanged = True
         cluster = np.zeros((X.shape[0]), dtype='int32')
+        # 迭代直到中心收敛
         while clusterChanged:
             clusterChanged = False
             # 聚类

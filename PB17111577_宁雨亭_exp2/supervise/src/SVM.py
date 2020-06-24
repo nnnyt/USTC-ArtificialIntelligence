@@ -29,6 +29,7 @@ class SVM:
         return np.exp(-np.sqrt(np.linalg.norm(x-y) ** 2 / (2 * self.sigma ** 2)))
                 
     def _cal_g(self, i):
+        # 计算g(xi)
         index = [i for i, alpha in enumerate(self.alpha) if alpha != 0]
         gxi = 0
         for j in index:
@@ -37,6 +38,7 @@ class SVM:
         return gxi
     
     def _is_satisfy_KKT(self, i):
+        # 判断第i个训练样本是否满足KKT条件
         yi = self.y_train[i]
         gxi = self._cal_g(i)
         if (np.fabs(self.alpha[i]) < self.epsilon) and (yi * gxi >= 1 - self.epsilon):
@@ -49,6 +51,7 @@ class SVM:
         return False
 
     def _cal_Ei(self, i):
+        # 计算Ei
         gxi = self._cal_g(i)
         return gxi - self.y_train[i]
 
@@ -59,9 +62,11 @@ class SVM:
         self.y_train = y_train 
         self.k = np.zeros((self.m, self.m))
 
+        # 计算核函数
         for i in range(self.m):
             for j in range(i, self.n):
                 self.k[i, j] = self.k[j, i] = self.kernel(self.x_train[i], self.x_train[j]) 
+        # 初始化差值Ei
         self.E = []
         for i in range(self.m):
             self.E.append(-self.y_train[i])
@@ -70,13 +75,13 @@ class SVM:
         flag = 0
         while flag == 0:
             iteration += 1
-            # print(iteration)
             flag = 1
             for i in range(self.m):
-                # choose the first alpha
+                # 选择第1个优化的变量
                 if self._is_satisfy_KKT(i) == False:
                     E1 = self.E[i]
                     maxdiff = -1
+                    # 选择第二个优化的变量，使|E1-E2|最大
                     for s in range(self.m):
                         tempdiff = np.fabs(self.E[s] - E1)
                         if tempdiff > maxdiff:
@@ -86,11 +91,13 @@ class SVM:
                     if maxdiff == -1:
                         continue
 
+                    # 保存旧值
                     y1 = self.y_train[i]
                     y2 = self.y_train[j]
                     alpha_old_1 = self.alpha[i]
                     alpha_old_2 = self.alpha[j]
 
+                    # 计算alpha2的取值范围L、H
                     if y1 != y2:
                         L = max(0, alpha_old_2 - alpha_old_1)
                         H = min(self.C, self.C + alpha_old_2 - alpha_old_1)
@@ -107,14 +114,18 @@ class SVM:
                     eta = k11 + k22 - 2 * k12
                     if eta <= 0:
                         continue
+                    # 更新alpha2
                     alpha_new_2 = alpha_old_2 + y2 * (E1 - E2) / (k11 + k22 - 2 * k12)
+                    # 裁剪alpha2
                     if alpha_new_2 < L:
                         alpha_new_2 = L
                     elif alpha_new_2 > H:
                         alpha_new_2 = H
 
+                    # 更新alpha1
                     alpha_new_1 = alpha_old_1 + y1 * y2 * (alpha_old_2 - alpha_new_2)
 
+                    # 更新阈值b
                     b1_new = -1 * E1 - y1 * k11 * (alpha_new_1 - alpha_old_1) \
                             - y2 * k21 * (alpha_new_2 - alpha_old_2) + self.b
                     b2_new = -1 * E2 - y1 * k12 * (alpha_new_1 - alpha_old_1) \
@@ -126,12 +137,14 @@ class SVM:
                     else:
                         b_new = (b1_new + b2_new) / 2
 
+                    # 判断迭代条件
                     if (np.fabs(alpha_new_2 - alpha_old_2) < self.epsilon ** 2) \
                         and (np.fabs(alpha_new_1 - alpha_old_1) < self.epsilon ** 2):
                         continue
                     else:
                         flag = 0
                     
+                    # 将更新值保存
                     self.alpha[i] = alpha_new_1
                     self.alpha[j] = alpha_new_2
                     self.b = b_new

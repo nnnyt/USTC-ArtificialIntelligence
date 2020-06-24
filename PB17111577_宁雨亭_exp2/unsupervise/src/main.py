@@ -6,21 +6,19 @@ from KMeans import KMeans
 
 
 def load_data(filename):
-    data = [[] for _ in range(13)]
+    data = [[] for _ in range(14)]
     with open(filename, 'r') as f:
         lines = csv.reader(f, delimiter=',')
         for line in lines:
-            for i in range(13):
+            for i in range(14):
                 data[i].append(float(line[i]))
     data  = np.array(data).T
     labels = data[:,0]
     x = data[:, 1:]
-    # min-max标准化
-    min_x = np.min(x, axis=0)
-    max_x = np.max(x, axis=0)
-    x = (x - min_x) / (max_x - min_x)
-    # print(labels.shape)
-    # print(x.shape)
+    # z-score标准化
+    mean_x = np.mean(x, axis=0)
+    std_x = np.std(x, axis=0)
+    x = (x - mean_x) / std_x
     return x, labels
 
 
@@ -46,17 +44,14 @@ def evaluate(cluster, y):
 
 
 def visualize(pca_x, cluster):
-    from sklearn.manifold import TSNE
     import pandas as pd
-    tsne = TSNE()
     y = np.array(cluster).reshape(-1, 1)
     x = pd.DataFrame(np.concatenate((pca_x, y), axis=-1))
-    a = tsne.fit_transform(x)
-    data = pd.DataFrame(a,index=x.index)
+    data = pd.DataFrame(x,index=x.index)
     d1 = data[x[2]==0]
     d2 = data[x[2]==1]
     d3 = data[x[2]==2]
-    plt.plot(d1[0],d1[1],'r.',d2[0],d2[1],'go',d3[0],d3[1],'b*')
+    plt.plot(d1[0],d1[1],'r.',d2[0],d2[1],'gx',d3[0],d3[1],'b*')
     plt.show()
 
 
