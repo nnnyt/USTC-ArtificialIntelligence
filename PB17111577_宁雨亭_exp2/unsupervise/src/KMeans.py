@@ -10,6 +10,7 @@ class KMeans():
         return np.sqrt(np.sum((x -  y) ** 2))
     
     def _evaluate(self, x, center, cluster):
+        # 找到每个簇最近的簇
         nearest = {}
         for i in range(len(center)):
             min_dist = 10000000
@@ -52,6 +53,7 @@ class KMeans():
             clusterChanged = False
             # 聚类
             for i in range(X.shape[0]):
+                # 对每一个样本计算距离最近的簇
                 min_dist = 10000000
                 min_index = 0
                 for j in range(self.k):
@@ -65,6 +67,7 @@ class KMeans():
             # 更新中心
             for j in range(self.k):
                 center[j] = np.mean(X[cluster == j], axis=0)
+        # 计算轮廓系数
         s = self._evaluate(X, center, cluster)
         return cluster, s
 
