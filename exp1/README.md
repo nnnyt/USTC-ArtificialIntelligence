@@ -3,7 +3,7 @@
 ## 文件结构
 
 ```
-PB17111577_宁雨亭_exp1
+exp1
 ├── README.md
 ├── report.pdf
 ├── digit
